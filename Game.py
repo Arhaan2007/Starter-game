@@ -27,13 +27,16 @@ obstacles = []
 obstacle_timer = pygame.time.get_ticks()
 score = 0
 game_state = "start"
+obstacle_spawn_delay = 1500
 
 def reset_game():
-    global player, obstacles, score, obstacle_timer
+    global player, obstacles, score, obstacle_timer, obstacles_speed, obstacle_spawn_delay
     player = pygame.Rect(50, screen_height // 6, player_width, player_height)
     obstacles = []
     score = 0
     obstacle_timer = pygame.time.get_ticks()
+    obstacles_speed = 5
+    obstacle_spawn_delay = 1500
 
 while True:
     screen.fill(white)
@@ -60,7 +63,7 @@ while True:
         if keys[pygame.K_DOWN] and player.y < screen_height - player_height:
             player.y += 5
 
-        if pygame.time.get_ticks() - obstacle_timer > 1500:
+        if pygame.time.get_ticks() - obstacle_timer > obstacle_spawn_delay:
             obstacle = pygame.Rect(screen_width, random.randint(0, screen_height - obstacle_height), obstacle_width, obstacle_height)
             obstacles.append(obstacle)
             obstacle_timer = pygame.time.get_ticks()
@@ -80,29 +83,11 @@ while True:
         score_text = font.render(f"Score: {score}", True, blue)
         screen.blit(score_text, (10, 10))
 
-        if score > 1000:
-            if pygame.time.get_ticks() - obstacle_timer > 800:
-                obstacle = pygame.Rect(screen_width, random.randint(0, screen_height - obstacle_height), obstacle_width, obstacle_height)
-                obstacles.append(obstacle)
-                obstacle_timer = pygame.time.get_ticks()
+        if score % 200 == 0 and score != 0:
+            obstacles_speed += 0.5
+            obstacle_spawn_delay = max(200, obstacle_spawn_delay - 100)
+            obstacle_spawn_delay -= 50
 
-        if score > 1500:
-            if pygame.time.get_ticks() - obstacle_timer > 400:
-                obstacle = pygame.Rect(screen_width, random.randint(0, screen_height - obstacle_height), obstacle_width, obstacle_height)
-                obstacles.append(obstacle)
-                obstacle_timer = pygame.time.get_ticks()
-
-        if score > 2000:
-            if pygame.time.get_ticks() - obstacle_timer > 200:
-                obstacle = pygame.Rect(screen_width, random.randint(0, screen_height - obstacle_height), obstacle_width, obstacle_height)
-                obstacles.append(obstacle)
-                obstacle_timer = pygame.time.get_ticks()
-
-        if score > 4000:
-            if pygame.time.get_ticks() - obstacle_timer > 180:
-                obstacle = pygame.Rect(screen_width, random.randint(0, screen_height - obstacle_height), obstacle_width, obstacle_height)
-                obstacles.append(obstacle)
-                obstacle_timer = pygame.time.get_ticks()
     elif game_state == "game_over":
         game_over_text = large_font.render("Game Over", True, red)
         score_text = font.render(f"Final Score: {score}", True, blue)
